@@ -1,113 +1,133 @@
-// variable for keeping in track the score 
+let HumanScore = 0;
+let ComputerScore = 0;
+let computerChoice = "";
+let humanChoice = "";
+let gameCount = 0;
 
-HumanScore = 0;
-ComputerScore = 0;
-
-function randomNo(){
-return Math.floor(Math.random() * 3);
+function WinnerAnnouncementEachRound(winner, computerChoice, humanChoice) {
+    const results = document.querySelector(".results");
+    results.textContent = `Computer choice: ${computerChoice} and Human choice: ${humanChoice}. Winner: ${winner}`;
 }
 
-
-function Intro() {
-    console.log("Welcome to the game Of ROCK PAPER SCISSORS ");
-    console.log("Press 1 for ROCK");
-    console.log("Press 2 for PAPER");
-    console.log("Press 3 for SCISSORS");
+function WinnerAnnouncement5Rounds(winner) {
+    const results = document.querySelector(".results");
+    results.textContent = `${winner}`;
 }
 
+function randomNo() {
+    return Math.floor(Math.random() * 3);
+}
 
-function computerMove(){
-
+function computerMove() {
     const move = randomNo();
-
-    if (move === 1) {
+    if (move === 0) {
         return 'rock';
-    } else if (move === 2) {
+    } else if (move === 1) {
         return 'paper';
     } else {
         return 'scissors';
     }
 }
 
-function humanMove(){
-    const choice = parseInt(prompt('Enter your choice (1 for Rock, 2 for Paper, 3 for Scissors): '), 10);
+function check4win(humanMove) {
+    const computerMoveSelection = computerMove();
+    computerChoice = computerMoveSelection;
+    humanChoice = humanMove;
 
-    if(choice<= 0 || choice > 3 ){
-
-        console.log("pick between 1 and 3 ");
-        return humanMove();
-    }
-    else {
-        if (choice === 1) {
-            return 'rock';
-        } else if (choice === 2) {
-            return 'paper';
-        } else {
-            return 'scissors';
-        }
-    }
-}
- 
-function check4win(){
-    const HumanMove = humanMove();
-    const ComputerMove = computerMove();
-
-
-    if(HumanMove ==  ComputerMove  ){
-        alert("Round concluded in a draw ");
-        return check4win();
-       }
-       else if (HumanMove === "rock" && ComputerMove === "paper" ||
-        HumanMove === "paper" && ComputerMove === "scissors" ||
-        HumanMove === "scissors" && ComputerMove === "rock") {
-                    
-                return 'computer';
-                                          }  
-     else {
+    if (humanMove === computerMoveSelection) {
+        return 'draw';
+    } else if (
+        (humanMove === "rock" && computerMoveSelection === "paper") ||
+        (humanMove === "paper" && computerMoveSelection === "scissors") ||
+        (humanMove === "scissors" && computerMoveSelection === "rock")
+    ) {
+        return 'computer';
+    } else {
         return 'human';
-                        }
+    }
 }
 
+function Rock4Rock(humanMove) {
+    gameCount++;
+    let roundResult = check4win(humanMove);
 
+    if (roundResult === 'human') {
+        HumanScore++;
+    } else if (roundResult === 'computer') {
+        ComputerScore++;
+    }
 
-function Rock4Rock(){
-    Intro();
+    WinnerAnnouncementEachRound(roundResult, computerChoice, humanChoice);
 
-
-    for (let index = 0; index < 5; index++) {
-
-        if(check4win() == "human"){
-            HumanScore++;
-            alert("YOU WIN ! ")
-            console.log("YOU WIN !");
-    
+    if (gameCount === 5) {
+        if (HumanScore > ComputerScore) {
+            WinnerAnnouncement5Rounds("Human wins the game");
+        } else if (ComputerScore > HumanScore) {
+            WinnerAnnouncement5Rounds("Computer wins the game");
+        } else {
+            WinnerAnnouncement5Rounds("The game is a draw");
         }
-        else{
-            ComputerScore++;
-            alert("computer wins ")
-            console.log("computer wins !");
-        }
- }
-  
-    console.log("GAME CONCLUDED");
 
-         if(HumanScore > ComputerScore){
-            alert("YOU WIN THE GAME");
-         }
-
-         else{
-            alert("Computer WINS !")
-         }
-
-       let choice = parseInt( prompt("enter 1 if u want to play again "));
-
-       if(choice == 1){
-        Rock4Rock;
-       }
-       else{
-        return;
-       }
-
+        // Reset scores and game count for the next series
+        HumanScore = 0;
+        ComputerScore = 0;
+        gameCount = 0;
+    }
 }
 
-Rock4Rock();
+document.addEventListener("DOMContentLoaded", () => {
+    const container = document.querySelector(".container");
+
+    if (container) {
+        container.style.color = "blue";
+        container.style.backgroundColor = "white";
+
+        const styleButton = (button) => {
+            button.style.cssText = `
+                font-size: 1.5em;
+                padding: 10px 20px;
+                margin: 10px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                background-color: lightgray;
+            `;
+        };
+
+        const rock = document.createElement("button");
+        rock.classList.add("rock");
+        rock.textContent = "Rock";
+        styleButton(rock);
+        container.appendChild(rock);
+
+        const paper = document.createElement("button");
+        paper.classList.add("paper");
+        paper.textContent = "Paper";
+        styleButton(paper);
+        container.appendChild(paper);
+
+        const scissors = document.createElement("button");
+        scissors.classList.add("scissors");
+        scissors.textContent = "Scissors";
+        styleButton(scissors);
+        container.appendChild(scissors);
+
+        const results = document.createElement("div");
+        results.classList.add("results");
+        container.appendChild(results);
+
+        rock.addEventListener("click", () => {
+            Rock4Rock("rock");
+        });
+
+        paper.addEventListener("click", () => {
+            Rock4Rock("paper");
+        });
+
+        scissors.addEventListener("click", () => {
+            Rock4Rock("scissors");
+        });
+    } else {
+        console.error("Container element not found.");
+    }
+});
